@@ -3,20 +3,21 @@
 
 plugins:
   - jest
+  - testing-library
 
 env:
-  node: true
+  browser: true
   es2021: true
 
 extends:
   - 'airbnb-base'
   - 'plugin:jest/recommended'
+  - 'plugin:testing-library/react'
 
 parserOptions:
   ecmaVersion: 2021
   sourceType: module
 
-rules:
-  no-console: 0
-  import/extensions: 0
-  no-underscore-dangle: [2, { "allow": ["__filename", "__dirname"] }]
+settings:
+  jest:
+    version: 26

@@ -18,5 +18,8 @@ lint-fix:
 publish:
 	npm publish
 
+start:
+	npx @hexlet/react-todo-app-with-backend
+
 .PHONY: test
 
