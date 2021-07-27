@@ -3,4 +3,5 @@ module.exports = {
   transformIgnorePatterns: [
     'node_modules/(?!@hexlet/.*)',
   ],
+  setupFilesAfterEnv: ['./jest.setup.js'],
 };
