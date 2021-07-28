@@ -20,15 +20,15 @@ const defaultState = {
   currentListId: primaryListId,
 };
 
-const addTask = async (taskName) => {
+const addTask = (taskName) => {
   const taskTextBox = screen.getByRole('textbox', { name: /new task/i });
   userEvent.type(taskTextBox, taskName);
 
   const view = screen.getByTestId('task-form');
   userEvent.click(within(view).getByRole('button', { name: /add/i }))
-
-  await screen.findByText(taskName);
 };
+
+const finishTask = (taskName) => userEvent.click(screen.getByRole('checkbox', { name: taskName }));
 
 test('initial start', () => {
   render(TodoApp(defaultState));
@@ -38,15 +38,56 @@ test('initial start', () => {
 });
 
 test('can add tasks', async () => {
-  const task1 = faker.lorem.word();
-  const task2 = faker.lorem.word();
   render(TodoApp(defaultState));
+  const task = faker.lorem.word();
   const taskForm = screen.getByTestId('task-form');
 
-  await addTask(task1);
-  await addTask(task2);
+  addTask(task);
 
-  expect(within(taskForm).getByRole('button', { name: /add/i })).not.toHaveValue();
-  expect(screen.getByText(task1)).toBeInTheDocument();
-  expect(screen.getByText(task2)).toBeInTheDocument();
+  await waitFor(() => {
+    expect(within(taskForm).getByRole('button', { name: /add/i })).not.toHaveValue();
+    expect(screen.getByText(task)).toBeInTheDocument();
+  });
+});
+
+test('can finish tasks', async () => {
+  const taskToFinish = faker.lorem.word();
+  const task = faker.lorem.word();
+  render(TodoApp(defaultState));
+
+  addTask(taskToFinish);
+  await screen.findByText(taskToFinish)
+
+  addTask(task);
+  await screen.findByText(task)
+
+  finishTask(taskToFinish);
+
+  const taskToFinishCheckbox = screen.getByRole('checkbox', { name: taskToFinish })
+  const tasks = screen.getByTestId('tasks');
+  await waitFor(() => {
+    expect(taskToFinishCheckbox).toBeChecked();
+    // refactor to matcher
+    const lastElement = tasks.children[tasks.children.length - 1];
+    expect(lastElement).toContainElement(taskToFinishCheckbox);
+  })
+});
+
+// как лучше делать менять стейт(как тут) или делать addTask и ждать с помощью await screen(как finish task)
+test('can delete task', async () => {
+  const taskName = faker.lorem.word();
+  const task = {
+    text: taskName,
+    listId: primaryListId,
+    id: getNextId(),
+    completed: false,
+    touched: Date.now(),
+  };
+  render(TodoApp({ ...defaultState, tasks: [task] }));
+
+  const tasks = screen.getByTestId('tasks');
+  const removeBtn = within(tasks).getByRole('button', { name: /remove/i });
+  userEvent.click(removeBtn);
+
+  await waitFor(() => expect(screen.queryByText(taskName)).not.toBeInTheDocument());
 });
