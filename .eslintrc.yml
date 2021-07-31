@@ -2,7 +2,6 @@
 
 plugins:
   - jest
-  - testing-library
   - react
 
 env:
@@ -13,7 +12,6 @@ env:
 extends:
   - airbnb
   - 'plugin:jest/recommended'
-  - 'plugin:testing-library/react'
 
 parser: "babel-eslint"
 parserOptions:
