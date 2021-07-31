@@ -1,5 +1,10 @@
 import React from 'react';
-import { render, screen, waitFor, within } from '@testing-library/react'
+import {
+  render,
+  screen,
+  waitFor,
+  within,
+} from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import faker from 'faker';
@@ -32,7 +37,7 @@ const addTask = (taskName) => {
 
   // mb ybrat within t.k ploxaya praktica
   const view = screen.getByTestId('task-form');
-  userEvent.click(within(view).getByRole('button', { name: /add/i }))
+  userEvent.click(within(view).getByRole('button', { name: /add/i }));
 };
 
 const finishTask = (taskName) => userEvent.click(screen.getByRole('checkbox', { name: taskName }));
@@ -63,26 +68,26 @@ test('can finish tasks', async () => {
   const task = faker.lorem.word();
 
   addTask(taskToFinish);
-  await screen.findByText(taskToFinish)
+  await screen.findByText(taskToFinish);
 
   addTask(task);
-  await screen.findByText(task)
+  await screen.findByText(task);
 
   finishTask(taskToFinish);
 
-  const taskToFinishCheckbox = screen.getByRole('checkbox', { name: taskToFinish })
+  const taskToFinishCheckbox = screen.getByRole('checkbox', { name: taskToFinish });
   const tasks = screen.getByTestId('tasks');
   await waitFor(() => {
     expect(taskToFinishCheckbox).toBeChecked();
     expect(tasks).lastElementContain(taskToFinishCheckbox);
-  })
+  });
 });
 
 test('can delete task', async () => {
   const taskName = faker.lorem.word();
 
   addTask(taskName);
-  await screen.findByText(taskName)
+  await screen.findByText(taskName);
 
   const tasks = screen.getByTestId('tasks');
   const removeBtn = within(tasks).getByRole('button', { name: /remove/i });
@@ -98,7 +103,7 @@ test('can add list', async () => {
 
   const lists = screen.getByTestId('lists');
   await waitFor(() => {
-    const list = screen.getByText(listName)
+    const list = screen.getByText(listName);
 
     expect(list).toBeVisible();
     expect(lists).lastElementContain(list);
