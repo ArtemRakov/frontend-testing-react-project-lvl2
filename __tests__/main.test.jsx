@@ -125,10 +125,8 @@ test('can only see current list tasks', async () => {
   userEvent.click(screen.getByText(listName));
   addTask(listTask);
 
-  await waitFor(() => {
-    expect(screen.getByText(listTask)).toBeVisible();
-    expect(screen.queryByText(task)).not.toBeInTheDocument();
-  });
+  expect(await screen.findByText(listTask)).toBeVisible();
+  await waitFor(() => expect(screen.queryByText(task)).not.toBeInTheDocument());
 });
 
 test('can delete list', async () => {
