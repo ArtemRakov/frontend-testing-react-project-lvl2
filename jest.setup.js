@@ -14,7 +14,6 @@ function lastElementContain(container, element) {
     checkHtmlElement(element, lastElementContain, this);
   }
 
-  // lalaeslint-disable-next-line testing-library/no-node-access
   const lastElement = container.lastElementChild;
   const result = toContainElement.call(this, lastElement, element);
 
