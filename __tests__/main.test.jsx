@@ -30,15 +30,16 @@ const addTask = (taskName) => {
 
 const finishTask = (taskName) => userEvent.click(screen.getByRole('checkbox', { name: taskName }));
 
-test('initial start', () => {
+beforeEach(() => {
   render(TodoApp(defaultState));
+});
 
+test('initial start', () => {
   expect(screen.getByRole('textbox', { name: /new list/i })).toBeInTheDocument();
   expect(screen.getByRole('textbox', { name: /new task/i })).toBeInTheDocument();
 });
 
 test('can add tasks', async () => {
-  render(TodoApp(defaultState));
   const task = faker.lorem.word();
   const taskForm = screen.getByTestId('task-form');
 
@@ -53,7 +54,6 @@ test('can add tasks', async () => {
 test('can finish tasks', async () => {
   const taskToFinish = faker.lorem.word();
   const task = faker.lorem.word();
-  render(TodoApp(defaultState));
 
   addTask(taskToFinish);
   await screen.findByText(taskToFinish)
@@ -67,23 +67,15 @@ test('can finish tasks', async () => {
   const tasks = screen.getByTestId('tasks');
   await waitFor(() => {
     expect(taskToFinishCheckbox).toBeChecked();
-    // refactor to matcher
-    const lastElement = tasks.children[tasks.children.length - 1];
-    expect(lastElement).toContainElement(taskToFinishCheckbox);
+    expect(tasks).lastElementContain(taskToFinishCheckbox);
   })
 });
 
-// как лучше делать менять стейт(как тут) или делать addTask и ждать с помощью await screen(как finish task)
 test('can delete task', async () => {
   const taskName = faker.lorem.word();
-  const task = {
-    text: taskName,
-    listId: primaryListId,
-    id: getNextId(),
-    completed: false,
-    touched: Date.now(),
-  };
-  render(TodoApp({ ...defaultState, tasks: [task] }));
+
+  addTask(taskName);
+  await screen.findByText(taskName)
 
   const tasks = screen.getByTestId('tasks');
   const removeBtn = within(tasks).getByRole('button', { name: /remove/i });
