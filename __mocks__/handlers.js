@@ -32,7 +32,7 @@ const tasks = [
     return res(
       ctx.status(201),
       ctx.json({ ...task, completed, touched: Date.now() }),
-    )
+    );
   }),
   rest.delete('/api/v1/tasks/:id', (req, res, ctx) => {
     const taskId = Number(req.params.id);
@@ -46,14 +46,14 @@ const tasks = [
 const lists = [
   rest.post('/api/v1/lists', (req, res, ctx) => {
     const { name } = req.body;
-      const list = {
-        id: getNextId(),
-        name,
-        removable: true,
-      };
-      state.lists.push(list);
+    const list = {
+      id: getNextId(),
+      name,
+      removable: true,
+    };
+    state.lists.push(list);
 
-      return res(ctx.status(201), ctx.json(list))
+    return res(ctx.status(201), ctx.json(list));
   }),
   rest.delete('/api/v1/lists/:id', (req, res, ctx) => {
     const listId = Number(req.params.id);
@@ -62,9 +62,9 @@ const lists = [
     state.tasks = state.tasks.filter((t) => t.listId !== listId);
 
     return res(ctx.status(204));
-  })
+  }),
 ];
 
-const handlers = [...tasks, ...lists]
+const handlers = [...tasks, ...lists];
 
 export { handlers };
