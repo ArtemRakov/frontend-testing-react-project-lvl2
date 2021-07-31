@@ -1,35 +1,42 @@
 // eslint-disable-next-line jest/no-mocks-import
 import { server } from './__mocks__/server.js'
-import { getMatchers } from "expect/build/jestMatchersObject";
+import { toContainElement } from '@testing-library/jest-dom/matchers';
+import { checkHtmlElement } from '@testing-library/jest-dom/dist/utils';
 
 beforeAll(() => server.listen())
 afterEach(() => server.resetHandlers())
 afterAll(() => server.close())
 
 
-expect.extend({
-  lastElementContain(container, element) {
-    const lastElement = container.lastElementChild;
-    const { pass } = getMatchers().toContainElement(lastElement, element);
+function lastElementContain(container, element) {
+  checkHtmlElement(container, lastElementContain, this)
 
-    return {
-      pass,
-      message: () => {
-        return [
-          this.utils.matcherHint(
-            `${this.isNot ? '.not' : ''}.toContainElement`,
-            'element',
-            'element',
-          ),
-          '',
-          this.utils.RECEIVED_COLOR(`${this.utils.stringify(
-            container.cloneNode(false),
-          )} ${
+  if (element !== null) {
+    checkHtmlElement(element, lastElementContain, this)
+  }
+
+  const lastElement = container.lastElementChild;
+  const result = toContainElement.call(this, lastElement, element)
+
+  return {
+    pass: result.pass,
+    message: () => {
+      return [
+        this.utils.matcherHint(
+          `${this.isNot ? '.not' : ''}.toContainElement`,
+          'element',
+          'element',
+        ),
+        '',
+        this.utils.RECEIVED_COLOR(`${this.utils.stringify(
+          container.cloneNode(false),
+        )} ${
           this.isNot ? 'last element contains:' : 'last element does not contain:'
         } ${this.utils.stringify(element ? element.cloneNode(false) : element)}
         `),
-        ].join('\n')
-      },
-    }
+      ].join('\n')
+    },
   }
-})
+}
+
+expect.extend({ lastElementContain })

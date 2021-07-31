@@ -20,10 +20,17 @@ const defaultState = {
   currentListId: primaryListId,
 };
 
+const addList = (listName) => {
+  const listTextBox = screen.getByRole('textbox', { name: /new list/i });
+  userEvent.type(listTextBox, listName);
+  userEvent.click(screen.getByText('add list'));
+};
+
 const addTask = (taskName) => {
   const taskTextBox = screen.getByRole('textbox', { name: /new task/i });
   userEvent.type(taskTextBox, taskName);
 
+  // mb ybrat within t.k ploxaya praktica
   const view = screen.getByTestId('task-form');
   userEvent.click(within(view).getByRole('button', { name: /add/i }))
 };
@@ -82,4 +89,52 @@ test('can delete task', async () => {
   userEvent.click(removeBtn);
 
   await waitFor(() => expect(screen.queryByText(taskName)).not.toBeInTheDocument());
+});
+
+test('can add list', async () => {
+  const listName = faker.lorem.word();
+
+  addList(listName);
+
+  const lists = screen.getByTestId('lists');
+  await waitFor(() => {
+    const list = screen.getByText(listName)
+
+    expect(list).toBeVisible();
+    expect(lists).lastElementContain(list);
+    expect(screen.getByText(/tasks list is empty/i)).toBeInTheDocument();
+  });
+});
+
+test('can only see current list tasks', async () => {
+  const task = faker.lorem.word();
+  const listTask = faker.lorem.word();
+  const listName = faker.lorem.word();
+
+  addTask(task);
+  await screen.findByText(task);
+
+  addList(listName);
+  await screen.findByText(listName);
+
+  userEvent.click(screen.getByText(listName));
+  addTask(listTask);
+
+  await waitFor(() => {
+    expect(screen.getByText(listTask)).toBeVisible();
+    expect(screen.queryByText(task)).not.toBeInTheDocument();
+  });
+});
+
+test('can delete list', async () => {
+  const listName = faker.lorem.word();
+
+  addList(listName);
+  await screen.findByText(listName);
+
+  const lists = screen.getByTestId('lists');
+  const removeListBtn = within(lists.lastElementChild).getByText('remove list');
+  userEvent.click(removeListBtn);
+
+  await waitFor(() => expect(screen.queryByText(listName)).not.toBeInTheDocument());
 });
