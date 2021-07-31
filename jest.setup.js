@@ -1,7 +1,7 @@
 import { toContainElement } from '@testing-library/jest-dom/matchers';
 import { checkHtmlElement } from '@testing-library/jest-dom/dist/utils';
 // eslint-disable-next-line jest/no-mocks-import
-import { server } from './__mocks__/server';
+import server from './__mocks__/server';
 
 beforeAll(() => server.listen());
 afterEach(() => server.resetHandlers());

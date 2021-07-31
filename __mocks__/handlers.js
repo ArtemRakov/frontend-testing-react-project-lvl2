@@ -67,4 +67,4 @@ const lists = [
 
 const handlers = [...tasks, ...lists];
 
-export { handlers };
+export default handlers;
