@@ -35,7 +35,6 @@ const addTask = (taskName) => {
   const taskTextBox = screen.getByRole('textbox', { name: /new task/i });
   userEvent.type(taskTextBox, taskName);
 
-  // mb ybrat within t.k ploxaya praktica
   const view = screen.getByTestId('task-form');
   userEvent.click(within(view).getByRole('button', { name: /add/i }));
 };
@@ -96,6 +95,17 @@ test('can delete task', async () => {
   await waitFor(() => expect(screen.queryByText(taskName)).not.toBeInTheDocument());
 });
 
+test('cannot create same task in the same list', async () => {
+  const taskName = faker.lorem.word();
+
+  addTask(taskName);
+  await screen.findByText(taskName);
+
+  addTask(taskName);
+
+  expect(await screen.findByText(`${taskName} already exists`)).toBeVisible();
+});
+
 test('can add list', async () => {
   const listName = faker.lorem.word();
 
@@ -129,6 +139,21 @@ test('can only see current list tasks', async () => {
   await waitFor(() => expect(screen.queryByText(task)).not.toBeInTheDocument());
 });
 
+test('can create same task in different lists', async () => {
+  const task = faker.lorem.word();
+  const listName = faker.lorem.word();
+
+  addTask(task);
+  await screen.findByText(task);
+
+  addList(listName);
+  await screen.findByText(listName);
+
+  addTask(task);
+
+  expect(await screen.findByText(task)).toBeVisible();
+});
+
 test('can delete list', async () => {
   const listName = faker.lorem.word();
 
@@ -140,4 +165,15 @@ test('can delete list', async () => {
   userEvent.click(removeListBtn);
 
   await waitFor(() => expect(screen.queryByText(listName)).not.toBeInTheDocument());
+});
+
+test('cannot create same list', async () => {
+  const listName = faker.lorem.word();
+
+  addList(listName);
+  await screen.findByText(listName);
+
+  addList(listName);
+
+  expect(await screen.findByText(`${listName} already exists`)).toBeVisible();
 });
