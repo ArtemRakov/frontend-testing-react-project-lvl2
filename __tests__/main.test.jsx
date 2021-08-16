@@ -9,11 +9,12 @@ import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import faker from 'faker';
 import _ from 'lodash';
+// eslint-disable-next-line jest/no-mocks-import
+import getServer from '../__mocks__/server';
 
 import TodoApp from '@hexlet/react-todo-app-with-backend';
 
 const getNextId = () => Number(_.uniqueId());
-
 const primaryListId = getNextId();
 const secondaryListId = getNextId();
 const defaultState = {
@@ -35,29 +36,35 @@ const addTask = (taskName) => {
   const taskTextBox = screen.getByRole('textbox', { name: /new task/i });
   userEvent.type(taskTextBox, taskName);
 
-  const view = screen.getByTestId('task-form');
-  userEvent.click(within(view).getByRole('button', { name: /add/i }));
+  const button = screen.getByRole('button', { name: 'Add' });
+  userEvent.click(button);
 };
 
 const finishTask = (taskName) => userEvent.click(screen.getByRole('checkbox', { name: taskName }));
 
+let server;
+
 beforeEach(() => {
+  server = getServer(defaultState);
+  server.listen();
+
   render(TodoApp(defaultState));
 });
 
-test('initial start', () => {
-  expect(screen.getByRole('textbox', { name: /new list/i })).toBeInTheDocument();
-  expect(screen.getByRole('textbox', { name: /new task/i })).toBeInTheDocument();
+afterEach(() => {
+  server.close();
 });
 
 test('can add tasks', async () => {
   const task = faker.lorem.word();
-  const taskForm = screen.getByTestId('task-form');
 
-  addTask(task);
+  const taskTextBox = screen.getByRole('textbox', { name: /new task/i });
+  userEvent.type(taskTextBox, task);
+  const button = screen.getByRole('button', { name: 'Add' });
+  userEvent.click(button);
 
   await waitFor(() => {
-    expect(within(taskForm).getByRole('button', { name: /add/i })).not.toHaveValue();
+    expect(screen.getByRole('textbox', { name: /new task/i })).not.toHaveValue();
     expect(screen.getByText(task)).toBeInTheDocument();
   });
 });
@@ -88,8 +95,7 @@ test('can delete task', async () => {
   addTask(taskName);
   await screen.findByText(taskName);
 
-  const tasks = screen.getByTestId('tasks');
-  const removeBtn = within(tasks).getByRole('button', { name: /remove/i });
+  const removeBtn = screen.getByRole('button', { name: 'Remove' });
   userEvent.click(removeBtn);
 
   await waitFor(() => expect(screen.queryByText(taskName)).not.toBeInTheDocument());

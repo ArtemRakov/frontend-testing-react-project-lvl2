@@ -1,14 +1,11 @@
 import { rest } from 'msw';
 import _ from 'lodash';
 
+/* eslint-disable no-param-reassign */
+
 const getNextId = () => Number(_.uniqueId());
 
-const state = {
-  tasks: [],
-  lists: [],
-};
-
-const tasks = [
+const tasks = (state) => ([
   rest.post('/api/v1/lists/:id/tasks', (req, res, ctx) => {
     const { text } = req.body;
 
@@ -41,9 +38,9 @@ const tasks = [
 
     return res(ctx.status(204));
   }),
-];
+]);
 
-const lists = [
+const lists = (state) => ([
   rest.post('/api/v1/lists', (req, res, ctx) => {
     const { name } = req.body;
     const list = {
@@ -63,8 +60,10 @@ const lists = [
 
     return res(ctx.status(204));
   }),
-];
+]);
 
-const handlers = [...tasks, ...lists];
+const handlers = (state) => [...tasks(state), ...lists(state)];
 
 export default handlers;
+
+/* eslint-enable no-param-reassign */
