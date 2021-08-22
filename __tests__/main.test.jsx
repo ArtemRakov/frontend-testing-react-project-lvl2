@@ -14,13 +14,11 @@ import getServer from '../__mocks__/server';
 
 import TodoApp from '@hexlet/react-todo-app-with-backend';
 
-const getNextId = () => Number(_.uniqueId());
-const primaryListId = getNextId();
-const secondaryListId = getNextId();
+const primaryListId = _.uniqueId();
 const defaultState = {
   lists: [
     { id: primaryListId, name: 'primary', removable: false },
-    { id: secondaryListId, name: 'secondary', removable: true },
+    { id: _.uniqueId(), name: 'secondary', removable: true },
   ],
   tasks: [],
   currentListId: primaryListId,

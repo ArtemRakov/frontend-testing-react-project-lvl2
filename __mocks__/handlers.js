@@ -3,16 +3,14 @@ import _ from 'lodash';
 
 /* eslint-disable no-param-reassign */
 
-const getNextId = () => Number(_.uniqueId());
-
 const tasks = (state) => ([
   rest.post('/api/v1/lists/:id/tasks', (req, res, ctx) => {
     const { text } = req.body;
 
     const task = {
       text,
-      listId: Number(req.params.id),
-      id: getNextId(),
+      listId: req.params.id,
+      id: _.uniqueId(),
       completed: false,
       touched: Date.now(),
     };
@@ -21,7 +19,7 @@ const tasks = (state) => ([
     return res(ctx.status(201), ctx.json(task));
   }),
   rest.patch('/api/v1/tasks/:id', (req, res, ctx) => {
-    const taskId = Number(req.params.id);
+    const taskId = req.params.id;
     const { completed } = req.body;
 
     const task = state.tasks.find((t) => t.id === taskId);
@@ -32,7 +30,7 @@ const tasks = (state) => ([
     );
   }),
   rest.delete('/api/v1/tasks/:id', (req, res, ctx) => {
-    const taskId = Number(req.params.id);
+    const taskId = req.params.id;
 
     state.tasks = state.tasks.filter((t) => t.id !== taskId);
 
@@ -44,7 +42,7 @@ const lists = (state) => ([
   rest.post('/api/v1/lists', (req, res, ctx) => {
     const { name } = req.body;
     const list = {
-      id: getNextId(),
+      id: _.uniqueId(),
       name,
       removable: true,
     };
@@ -53,7 +51,7 @@ const lists = (state) => ([
     return res(ctx.status(201), ctx.json(list));
   }),
   rest.delete('/api/v1/lists/:id', (req, res, ctx) => {
-    const listId = Number(req.params.id);
+    const listId = req.params.id;
 
     state.lists = state.lists.filter((l) => l.id !== listId);
     state.tasks = state.tasks.filter((t) => t.listId !== listId);
