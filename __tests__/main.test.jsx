@@ -145,7 +145,7 @@ describe('lists', () => {
     userEvent.click(screen.getByText(listName));
     addTask(listTask);
 
-    expect(await screen.findByText(listTask)).toBeVisible();
+    expect(await screen.findByText(listTask)).toBeInTheDocument();
     expect(screen.queryByText(task)).not.toBeInTheDocument();
   });
 
